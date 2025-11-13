@@ -2,6 +2,7 @@
 
 export ROOTREPL="rpool/repl"
 export ROOTSANDBOX="rpool/SANDBOX"
+export TIMEZONE="Europe/Berlin"
 
 # proxmox
 export PINSTANCEPREFIX=$(date +"9%m%d") # ID-PREFIX Proxmo Sandbox instances
@@ -53,6 +54,7 @@ create_or_destroy() {
 
         ds_list=$(zfs list -d1 -Ho name $ROOTSANDBOX | grep "sandbox")
         test $ds_list && del_ds=$(gum choose --limit 1 --header "Wähle Sandbox zum löschen" $ds_list)
+        del_ds=$(gum choose --limit 1 --header "Wähle Sandbox zum löschen" $ds_list)
         test $del_ds && {
             test_is_proxmox && cleanup_pve_sandbox $del_ds
         }
@@ -67,7 +69,8 @@ delete_sandbox (){
 select_snapshot() {
     gumdebug "[Section:select_snapshot]"
     snaps=$(zfs list -d 2 -t snapshot -Ho name $ROOTREPL | cut -d "@" -f2| sort -u)
-    SELSNAPDATE=$(gum choose $snaps)
+    SELSNAPDATE=$(gum filter $snaps)
+    #SELSNAPDATE=$(gum choose $snaps)
 
     # Setzte benöitge variables für config Dateien
     export INSTANCETAG="sb-$SELSNAPDATE"
